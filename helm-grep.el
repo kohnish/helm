@@ -327,7 +327,7 @@ will have no effect, use customize instead."
 
 (defcustom helm-grep-ag-command
   (cond ((executable-find "rg")
-         "rg --color=always --smart-case --search-zip --no-heading --line-number %s -- %s %s")
+         "rg --color=always -i --max-filesize=1024000 --mmap --no-unicode --no-heading --line-number %s -- %s %s")
         ((executable-find "ag")
          "ag --line-numbers -S --color --nogroup %s -- %s %s"))
   "The default command for RG or AG.
