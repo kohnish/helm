@@ -326,10 +326,11 @@ will have no effect, use customize instead."
            (define-key helm-grep-map (kbd "<left>")  nil))))
 
 (defcustom helm-grep-ag-command
-  (cond ((executable-find "rg")
-         "rg --color=always --smart-case --search-zip --no-heading --line-number %s -- %s %s")
-        ((executable-find "ag")
-         "ag --line-numbers -S --color --nogroup %s -- %s %s"))
+  (cond
+    ((executable-find "ag")
+      "ag --line-numbers -S --color --nogroup %s -- %s %s")
+    ((executable-find "rg")
+         "rg --color=always -i --max-filesize=1024000 --mmap --no-unicode --no-heading --line-number %s -- %s %s"))
   "The default command for RG or AG.
 
 Prefer RG by default if available.
