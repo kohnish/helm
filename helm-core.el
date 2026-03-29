@@ -411,7 +411,7 @@ i.e. the loop is not entered after running COMMAND."
     (define-key map (kbd "M-<")        #'helm-beginning-of-buffer)
     (define-key map (kbd "M->")        #'helm-end-of-buffer)
     (define-key map (kbd "C-g")        #'helm-keyboard-quit)
-    (define-key map (kbd "<RET>")      #'helm-maybe-exit-minibuffer)
+    (define-key map (kbd "<RET>")      #'helm-exit-minibuffer)
     (define-key map (kbd "C-i")        #'helm-select-action)
     (define-key map (kbd "C-j")        #'helm-execute-persistent-action)
     (define-key map (kbd "C-o")        #'helm-next-source)
@@ -6647,6 +6647,7 @@ message \\='no match'."
 
 (defun helm-exit-minibuffer ()
   "Select the current candidate by exiting the minibuffer."
+  (interactive)
   (unless helm-current-prefix-arg
     (setq helm-current-prefix-arg current-prefix-arg))
   (setq helm-exit-status 0)
