@@ -384,6 +384,7 @@ When GSHORTHANDS is nil use PATTERN unmodified."
                 :help-message 'helm-moccur-help-message
                 :nomark t
                 :migemo t
+                :multimatch nil
                 ;; Needed for resume.
                 :history 'helm-occur-history
                 :candidate-number-limit helm-occur-candidate-number-limit

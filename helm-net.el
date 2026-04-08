@@ -244,6 +244,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
                   (funcall helm-google-suggest-default-function))
     :action 'helm-google-suggest-actions
     :match-dynamic t
+    :multimatch nil
     :keymap helm-map
     :requires-pattern 3))
 
