@@ -60,63 +60,18 @@ that display the basename of candidate here."
     :header-name (lambda (name)
                    (concat name " in [" (helm-default-directory) "]"))
     :candidates-process 'helm-find-shell-command-fn
-    :filtered-candidate-transformer 'helm-findutils-transformer
-    :action-transformer 'helm-transform-file-load-el
-    :persistent-action 'helm-ff-kill-or-find-buffer-fname
     :action 'helm-type-file-actions
-    :help-message 'helm-generic-file-help-message
     :keymap helm-find-map
     :candidate-number-limit 9999
-    :requires-pattern 3))
-
-(defun helm-findutils-transformer (candidates _source)
-  (let (non-essential
-        (default-directory (helm-default-directory)))
-    (cl-loop for i in candidates
-             for abs = (expand-file-name
-                        (helm-aif (file-remote-p default-directory)
-                            (concat it i) i))
-             for type = (car (file-attributes abs))
-             for fname = (if (and helm-ff-transformer-show-only-basename
-                                  (not (string-match "[.]\\{1,2\\}$" i)))
-                             (helm-basename abs)
-                           (funcall helm-find-show-full-path-fn abs))
-             for disp = (helm-acase type
-                          ('t (propertize fname 'face 'helm-ff-directory))
-                          ((guard* (stringp it))
-                           (propertize fname 'face 'helm-ff-symlink))
-                          (otherwise (propertize fname 'face 'helm-ff-file)))
-             collect (cons (helm-ff-prefix-filename disp abs) abs))))
+    :multimatch nil
+    :volatile t
+    :requires-pattern 0))
 
 (defun helm-find--build-cmd-line ()
   (require 'find-cmd)
   (let* ((default-directory (or (file-remote-p default-directory 'localname)
-                                default-directory))
-         (patterns+options (split-string helm-pattern "\\(\\`\\| +\\)\\* +"))
-         (fold-case (helm-set-case-fold-search (car patterns+options)))
-         (patterns (split-string (car patterns+options)))
-         (additional-options (and (cdr patterns+options)
-                                  (list (concat (cadr patterns+options) " "))))
-         (ignored-dirs ())
-         (ignored-files (when helm-findutils-skip-boring-files
-                          (cl-loop for f in completion-ignored-extensions
-                                   if (string-match "/$" f)
-                                   do (push (replace-match "" nil t f)
-                                            ignored-dirs)
-                                   else collect (concat "*" f))))
-         (path-or-name (if helm-findutils-search-full-path
-                           '(ipath path) '(iname name)))
-         (name-or-iname (if fold-case
-                            (car path-or-name) (cadr path-or-name))))
-    (find-cmd (and ignored-dirs
-                   `(prune (name ,@ignored-dirs)))
-              (and ignored-files
-                   `(not (name ,@ignored-files)))
-              `(and ,@(mapcar
-                       (lambda (pattern)
-                         `(,name-or-iname ,(concat "*" pattern "*")))
-                       patterns)
-                    ,@additional-options))))
+                                default-directory)))
+    (concat find-program " " (shell-quote-argument helm-pattern))))
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'.
