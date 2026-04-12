@@ -789,6 +789,11 @@ for more info."
   :group 'helm
   :type '(choice integer function))
 
+(defcustom helm-display-buffer-occur-height nil
+  "occur height"
+  :group 'helm
+  :type '(choice integer function))
+
 (defcustom helm-display-buffer-default-width nil
   "Initial width of `helm-buffer', specified as an integer or a function.
 
