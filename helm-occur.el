@@ -250,19 +250,26 @@ engine beeing completely different and also much faster."
                         (goto-char (setq pos prev-pos))
                         (helm-aif (thing-at-point 'symbol) (regexp-quote it)))))
           (narrow-to-region beg end)))
-      (unwind-protect
-           (helm :sources 'helm-source-occur
-                 :buffer "*helm occur*"
-                 :history 'helm-occur-history
-                 :default (or def (helm-aif (thing-at-point 'symbol)
-                                      (regexp-quote it)))
-                 :preselect (and (memq 'helm-source-occur
-                                       helm-sources-using-default-as-input)
-                                 (format "^%d:" (line-number-at-pos
-                                                 (or pos (point)))))
-                 :truncate-lines helm-occur-truncate-lines)
-        (deactivate-mark t)
-        (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate)))))
+      (let ((was-helm-auto-mode helm-autoresize-mode))
+        (unwind-protect
+          (progn
+            (when (and helm-display-buffer-occur-height helm-autoresize-mode)
+              (helm-autoresize-mode -1))
+            (let ((helm-display-buffer-default-height (when helm-display-buffer-occur-height (+ 1 helm-display-buffer-occur-height))))
+              (helm :sources 'helm-source-occur
+                :buffer "*helm occur*"
+                :history 'helm-occur-history
+                :default (or def (helm-aif (thing-at-point 'symbol)
+                                   (regexp-quote it)))
+                :preselect (and (memq 'helm-source-occur
+                                  helm-sources-using-default-as-input)
+                             (format "^%d:" (line-number-at-pos
+                                              (or pos (point)))))
+                :truncate-lines helm-occur-truncate-lines)))
+          (when was-helm-auto-mode
+            (helm-autoresize-mode 1))
+          (deactivate-mark t)
+          (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))))))
 
 ;;;###autoload
 (defun helm-occur-visible-buffers ()
@@ -791,7 +798,7 @@ numbered.  The property \\='buffer-name is added to the whole string."
                   (helm-grep-highlight-match str))
           candidate)))
 
-(define-derived-mode helm-occur-mode
+(define-derived-mode helm-occur-mode fundamental-mode
     special-mode "helm-moccur"
     "Major mode to provide actions in helm moccur saved buffer.
 
