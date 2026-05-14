@@ -799,7 +799,7 @@ numbered.  The property \\='buffer-name is added to the whole string."
           candidate)))
 
 (define-derived-mode helm-occur-mode fundamental-mode
-    special-mode "helm-moccur"
+    "helm-moccur"
     "Major mode to provide actions in helm moccur saved buffer.
 
 Special commands:
